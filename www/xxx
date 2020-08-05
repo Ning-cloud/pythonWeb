@@ -1,5 +1,0 @@
-ORM
-运行时要获取Model的属性信息，表中的列对应于类中的属性，可通过某种方式表明某个属性是表的主键或有默认值或有其他的设置，表中的一行对应于一个Model对象
-运行时Java使用Annotation的方式来标注类的属性，运行时动态生成表，Python使用Metaclass，在运行时利用Metaclass动态构建类（type可以动态创建类，__new__方法负责类的创建，__init__负责类的初始化，__new__在__init__之前调用），再有类创造实例
-封装CRUD功能(create retrieve update delete)
-封装其他功能

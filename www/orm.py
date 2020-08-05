@@ -6,7 +6,7 @@ __author__='Jerome'
 import asyncio,logging
 import aiomysql
 
-def log(sql,args=())
+def log(sql,args=()):
     logging.info('SQL: %s'%sql)
 
 #loop事件循环
@@ -19,7 +19,7 @@ async def create_pool(loop,**kw):
         user=kw['user'],
         password=kw['password'],
         db=kw['db'],
-        charset=kw.get('charset','utf-8'),
+        charset=kw.get('charset','utf8'),
         autocommit=kw.get('autocommit',True),
         maxsize=kw.get('maxsize',10),
         minsize=kw.get('minsize',1),
@@ -126,7 +126,7 @@ class ModelMetaclass(type):
         attrs['__primary_key__']=primaryKey
         attrs['__fields__']=fields #除主键外的属性名
         attrs['__select__']='select `%s`,`%s` from `%s` ' % (primaryKey,', '.join(escaped_fields),tableName)
-        attrs['__insert__']='insert into `%s` (%s `%s`) values(%s)' % (tableName,', '.join(escaped_fields),primaryKey,create_args_string(len(escaped_fields)+1))
+        attrs['__insert__']='insert into `%s` (%s, `%s`) values(%s)' % (tableName,', '.join(escaped_fields),primaryKey,create_args_string(len(escaped_fields)+1))
         attrs['__update__']='update `%s` set %s where `%s`=?' % (tableName,', '.join(map(lambda f: '`%s`=?'%(mappings.get(f).name or f),fields)),primaryKey)
         attrs['__delete__']='delete from `%s` where `%s`=?' % (tableName,primaryKey)
         return type.__new__(cls,name,bases,attrs)    
@@ -203,7 +203,7 @@ class Model(dict,metaclass=ModelMetaclass):
         rs = await select('%s where `%s`=?' % (cls.__select__,cls.__primary_key__),[pk],1)
         if len(rs) == 0:
             return None
-        return cls[**rs[0]]
+        return cls(**rs[0])
 
     async def save(self):
         args=list(map(self.getValueOrDefault,self.__fields__))
