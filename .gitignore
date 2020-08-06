@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-console.sql
+data
 test.py
 comment
 
