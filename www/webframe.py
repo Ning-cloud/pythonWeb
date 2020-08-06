@@ -95,7 +95,7 @@ def has_request_arg(fn):
             raise ValueError('request parameter must be the last named parameter in function: %s%s' % (fn.__name__,str(sig)))
     return found
 
-def RequestHandler(object):
+class RequestHandler(object):
     '''
     从url处理函数fn中分析出需要接受的参数，从request中取出必要的参数，调用URL函数，结果转换成web.Response对象
     '''
@@ -129,6 +129,7 @@ def RequestHandler(object):
     async def __call__(self,request):
         kw = None
         #*后的参数和关键字参数
+        logging.info('begin assemble url handler parameter.')
         if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
             if request.method == 'POST':
                 if not request.content_type:
@@ -212,6 +213,7 @@ def add_routes(app,module_name):
         2. www.handlers
     '''
     n = module_name.rfind('.')
+    logging.info('automatic register url handler in Module: %s' % module_name)
     if n == -1:
         mod=__import__(module_name,globals(),locals())
     else:
@@ -223,7 +225,7 @@ def add_routes(app,module_name):
         fn = getattr(mod,attr)
         if callable(fn):
             method=getattr(fn,'__method__',None)
-            path=getattr(fn,'__path__',None)
+            path=getattr(fn,'__route__',None)
             if method and path:
                 add_route(app,fn)
         

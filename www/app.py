@@ -7,7 +7,12 @@ __author__='Jerome'
 async web application
 '''
 
-import logging; logging.basicConfig(level=logging.INFO)
+import logging
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%d-%m-%Y:%H:%M:%S')
+
+logging.getLogger().setLevel(logging.DEBUG)
+logger = logging.getLogger()
 
 import asyncio, os, json, time
 from datetime import datetime
@@ -48,6 +53,7 @@ async def logger_factory(app,handler):
     '''
     async def logger(request):
         logging.info('Request: %s %s' % (request.method,request.path))
+        return (await handler(request))
     return logger
 
 async def data_factory(app,handler):
@@ -73,6 +79,8 @@ async def response_factory(app,handler):
     async def response(request):
         logging.info('Response handler...')
         r = await handler(request)
+        if isinstance(r,web.StreamResponse):
+            return r
         if isinstance(r,bytes):
             resp = web.Response(body=r)
             resp.content_type = 'application/octet-stream'
